@@ -120,7 +120,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     for dir in os.listdir(args.path):
-        if dir.startswith("batch"):
+        if dir.startswith("batch"): #using "batch" here as our data consisted of subdirectories names for which start with "batch" - trips processes data files in batches and produces subdirectories with "batch" in their names
             dir = os.path.join(args.path, dir)
             for file in os.listdir(dir):
                 if file.endswith(".xml"):
