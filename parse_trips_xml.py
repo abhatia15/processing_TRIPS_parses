@@ -5,31 +5,34 @@ import argparse
 import os
 import re
 import xml.etree.ElementTree as ET
+import time
 
 
 def get_clean_parse(file):
+    out = []
     try:
         a.split("<rdf:RDF")[1].split("</terms>")[0]
         rdf_pattern = "<rdf:RDF" + a.split("<rdf:RDF")[1].split("</terms>")[0]
     except IndexError:
-        print file.split("/")[-1] + " does not have a parse."
+        out = file.split("/")[-1] + "\n"
+        error.write(out)
         return
-
+    
     pattern = re.compile(r' input=".+\n')
     if pattern.search(a):
         TEXT = "\n     <TEXT> " + \
             a.split("input=\"")[1].split('\n"')[0] + "</TEXT>"
 
     # not very efficient but quickly done, change later so don't have to
-    # create files for intermediate processing
+    # create a file for intermediate processing
     file = file + ".rdf"
-    g = open(file, 'w')
-    g.write(rdf_pattern)
-    g.close()
+    with open(file, 'w') as g:
+        g.write(rdf_pattern)
 
     file_name = file
     tree = ET.parse(file_name)
     root = tree.getroot()
+    os.remove(file)
 
     relation_id = 0
 
@@ -105,13 +108,13 @@ def get_clean_parse(file):
         n += 1
     myparse += "\n</SENTENCE>\n\n"
 
-    with open(file + '.clean', 'w') as new:
+    with open(file.split(".rdf")[0] + '.clean', 'w') as new:
         new.write(myparse)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='This is a script to create a cleaner/simpler XML from the TRIPS XML output.')
+        description='This is a script to create cleaner/simpler XMLs from the TRIPS XML output.')
     parser.add_argument(
         "--path",
         dest="path",
@@ -119,11 +122,14 @@ if __name__ == '__main__':
         help='path to the input directory containing all TRIPS XML parses')
     args = parser.parse_args()
 
-    for dir in os.listdir(args.path):
-        if dir.startswith("batch"): #using "batch" here as our data consisted of subdirectories names for which start with "batch" - trips processes data files in batches and produces subdirectories with "batch" in their names
+    with open(time.strftime("%Y%m%d-%H%M") + '.err', 'a') as error:
+     error.write("The following files did not have a parse.\n\n")
+     for dir in os.listdir(args.path):
+        if dir.startswith("batch"):
             dir = os.path.join(args.path, dir)
             for file in os.listdir(dir):
                 if file.endswith(".xml"):
                     with open(os.path.join(args.path, dir, file), 'r') as f:
                         a = f.read()
                         get_clean_parse(os.path.join(input, dir, file))
+    print "********************\nCleaned parses are in the same directory as the original parse files.\n\nFile %s in the current directory contains the list of files that did not have parses to be cleaned.\n********************\n" % str(error).split("'")[1]
