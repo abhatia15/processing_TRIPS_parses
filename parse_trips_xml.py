@@ -9,10 +9,9 @@ import time
 
 
 def get_clean_parse(file):
-    out = []
     try:
-        a.split("<rdf:RDF")[1].split("</terms>")[0]
-        rdf_pattern = "<rdf:RDF" + a.split("<rdf:RDF")[1].split("</terms>")[0]
+        test_pattern = a.split("<rdf:RDF")[1].split("</terms>")[0]
+        rdf_pattern = "<rdf:RDF" + test_pattern
     except IndexError:
         out = file.split("/")[-1] + "\n"
         error.write(out)
