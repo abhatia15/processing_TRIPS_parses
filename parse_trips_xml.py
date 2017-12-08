@@ -23,7 +23,7 @@ def get_clean_parse(file):
             a.split("input=\"")[1].split('\n"')[0] + "</TEXT>"
 
     # not very efficient but quickly done, change later so don't have to
-    # create a file for intermediate processing
+    # create files for intermediate processing
     file = file + ".rdf"
     with open(file, 'w') as g:
         g.write(rdf_pattern)
