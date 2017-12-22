@@ -19,8 +19,7 @@ def get_clean_parse(file):
     
     pattern = re.compile(r' input=".+\n')
     if pattern.search(a):
-        TEXT = "\n     <TEXT> " + \
-            a.split("input=\"")[1].split('\n"')[0] + "</TEXT>"
+        TEXT = '\n     <TEXT> "' + a.split("input=\"")[1].split('\n"')[0] + '"</TEXT>'
 
     # not very efficient but quickly done, change later so don't have to
     # create files for intermediate processing
@@ -43,13 +42,12 @@ def get_clean_parse(file):
     rootchunkitem = 0
     while rootchunkitem < len(root[0]):
         if root[0][rootchunkitem].tag.split("}")[1] == 'start':
-            startval = "start=" + root[0][rootchunkitem].text
+            startval = 'start="' + root[0][rootchunkitem].text + '"'
         elif root[0][rootchunkitem].tag.split("}")[1] == 'end':
-            endval = "end=" + root[0][rootchunkitem].text
+            endval = 'end="' + root[0][rootchunkitem].text + '"'
         rootchunkitem += 1
 
-    myparse = "\n<SENTENCE id=" + \
-        root[0].attrib.values()[0] + " " + startval + " " + endval + ">" + TEXT
+    myparse = '\n<SENTENCE id="' + root[0].attrib.values()[0] + '" ' + startval + " " + endval + ">" + TEXT
 
     chunk_id = {}
     n = 0
@@ -85,24 +83,22 @@ def get_clean_parse(file):
             else:
                 role_list.append(key)
 
-        myparse += "\n     " + "<PHRASE" + " id=" + \
-            chunk_id[n] + " type=" + root[n][1].text + " " + root[n][0].tag.split("}")[1] + "=" + root[n][0].text
+        myparse += '\n     <PHRASE id="' + chunk_id[n] + '" type="' + root[n][1].text + '" ' + root[n][0].tag.split("}")[1] + '="' + root[n][0].text + '"'
 
         for lf in lf_list:
             if root[n][int(lf)].tag.split("}")[1] == 'start':
-                startval = "start=" + root[n][int(lf)].text
+                startval = 'start="' + root[n][int(lf)].text + '"'
             elif root[n][int(lf)].tag.split("}")[1] == 'end':
-                endval = "end=" + root[n][int(lf)].text
+                endval = 'end="' + root[n][int(lf)].text + '"'
             if (root[n][int(lf)].tag.split("}")[1] != 'start') and (
                     root[n][int(lf)].tag.split("}")[1] != 'end'):
                 myparse += " " + \
-                    root[n][int(lf)].tag.split("}")[1] + "=" + root[n][int(lf)].text
-        myparse += " " + startval + " " + endval + ">"
+                    root[n][int(lf)].tag.split("}")[1] + '="' + root[n][int(lf)].text + '"'
+        myparse += " " + startval + " " + endval + "/>"
 
         for role in role_list:
             relation_id += 1
-            myparse += "\n     " + "<RELATION id=" + \
-                str(relation_id) + " head=" + chunk_id[n] + " " + "res=" + dic_text[role].split("#")[1] + " label=" + dic_tag[role] + ">"
+            myparse += '\n     <RELATION id="' + str(relation_id) + '" head="' + chunk_id[n] + '" res="' + dic_text[role].split("#")[1] + '" label="' + dic_tag[role] + '"/>'
 
         n += 1
     myparse += "\n</SENTENCE>\n\n"
