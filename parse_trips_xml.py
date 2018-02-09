@@ -6,12 +6,19 @@ import os
 import re
 import xml.etree.ElementTree as ET
 import time
+import pandas as pd
 
+d = {}
 
 def get_clean_parse(file):
     try:
-        test_pattern = a.split("<rdf:RDF")[1].split("</terms>")[0]
-        rdf_pattern = "<rdf:RDF" + test_pattern
+        new_rdf_pattern = ""
+        relevant_rdf_pattern = a.split("<rdf:Description")[1:]
+        for item in relevant_rdf_pattern:
+            individual_rdf = item.split("</rdf:Description>")[0]
+            new_rdf_pattern += "  <rdf:Description" + individual_rdf + "</rdf:Description>\n"
+        root_pattern = a.split("<rdf:RDF")[1].split("<rdf:Description")[0]
+        rdf_pattern = "<rdf:RDF  " + root_pattern + new_rdf_pattern + "</rdf:RDF>"
     except IndexError:
         out = file.split("/")[-1] + "\n"
         error.write(out)
@@ -64,7 +71,7 @@ def get_clean_parse(file):
             dic_tag[str(p)] = str(root[n][p].tag.split("}")[1])
 
             if root[n][p].tag.split("}")[1] == 'start' or root[n][p].tag.split("}")[
-                    1] == 'end':
+                    1] == 'end' or root[n][p].tag.split("}")[1] == 'word':
                 dic_text[str(p)] = str(p)
             else:
                 if root[n][p].text is None:
@@ -90,11 +97,19 @@ def get_clean_parse(file):
                 startval = 'start="' + root[n][int(lf)].text + '"'
             elif root[n][int(lf)].tag.split("}")[1] == 'end':
                 endval = 'end="' + root[n][int(lf)].text + '"'
+            elif root[n][int(lf)].tag.split("}")[1] == 'word':
+                textval = 'text="' + root[n][int(lf)].text + '"'
+                #print "textval: ", textval
             if (root[n][int(lf)].tag.split("}")[1] != 'start') and (
-                    root[n][int(lf)].tag.split("}")[1] != 'end'):
+                    root[n][int(lf)].tag.split("}")[1] != 'end') and(root[n][int(lf)].tag.split("}")[1] != 'word'):
                 myparse += " " + \
                     root[n][int(lf)].tag.split("}")[1] + '="' + root[n][int(lf)].text + '"'
-        myparse += " " + startval + " " + endval + "/>"
+
+        try:
+            textval
+            myparse += " " + textval + " " + startval + " " + endval + "/>"
+        except NameError:
+            myparse += " " + startval + " " + endval + "/>"
 
         for role in role_list:
             relation_id += 1
