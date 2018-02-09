@@ -2,6 +2,7 @@
 processing TRIPS
 
 Usage:
+
 Step 1:
 python parse_trips_xml.py --path PATH-TO-DIRECTORY-WITH-TRIPS-XMLs
 
