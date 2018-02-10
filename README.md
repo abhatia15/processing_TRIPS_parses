@@ -14,3 +14,5 @@ python convert_cleaned_xmls_to_refinedxmls.py --path PATH-TO-DIRECTORY-WITH-TRIP
 This will take the original XMLs as well as the clean XMLs produced in step 1 and refine the cleaned XMLs further.
 
 TO DO: The changes in step 2 should be made while producing the clean XMLs in step 1 itself to make it more efficient. 
+
+Note that the scripts look for directories containing data in subdirectories whose names begin with "batch". TRIPS produces XML parses in batch directories which we intend to use as input. 
