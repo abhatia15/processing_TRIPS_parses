@@ -1,4 +1,4 @@
-# trips
+# Processing TRIPS parses
 processing TRIPS
 
 Usage:
